@@ -44,12 +44,18 @@ STATE_CHOICES = (
 
 
 class Customer(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
     name = models.CharField(max_length=200)
     locality = models.CharField(max_length=200)
     city = models.CharField(max_length=200)
     zipcode = models.ImageField()
-    state = models.CharField(choices=STATE_CHOICES, max_length=200)
+    state = models.CharField(
+        choices=STATE_CHOICES,
+        max_length=200
+    )
 
     def __str__(self):
         return str(self.id)
@@ -64,15 +70,61 @@ CATEGORY_CHOICES = (
 
 
 class Product(models.Model):
+
     title = models.CharField(max_length=200)
     selling_price = models.FloatField()
     discounted_price = models.FloatField()
-    description = models.CharField(max_length=200)
+    description = models.TextField()
     brand = models.CharField(max_length=100)
-    category = models.CharField(choices=CATEGORY_CHOICES, max_length=2)
+    category = models.CharField(
+        choices=CATEGORY_CHOICES,
+        max_length=200
+    )
     product_image = models.ImageField(upload_to='productimg')
 
     def __str__(self):
         return str(self.id)
 
+
+class Cart(models.Model):
+
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    product_id = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return str(self.id)
+
+
+STATUS_CHOICES = (
+    ('pending', 'Pending'),
+    ('accepted', 'Accepted'),
+    ('packed', 'Packed'),
+    ('on_the_way', 'On The Way'),
+    ('delivered', 'Delivered'),
+    ('cancel', 'Cancelled'),
+)
+
+
+class OrderPlaced(models.Model):
+
+    user_id = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+    customer_id = models.ForeignKey(
+        Customer,
+        on_delete=models.CASCADE
+    )
+    product_id = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE
+    )
+    quantity = models.PositiveIntegerField(default=1)
+    order_date = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(
+        choices=STATUS_CHOICES,
+        default='pending',
+        max_length=200
+    )
 
